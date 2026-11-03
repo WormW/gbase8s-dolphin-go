@@ -14,8 +14,9 @@
 - 二进制参数使用 `decode(..., 'hex')` 写入，并解码 BLOB 结果中的 `\x` 十六进制形式。
 - 当单条 `INSERT` 未返回自增 ID 时，在同一连接上补查 `LAST_INSERT_ID()`。
 - 提供只读或包含写入的冒烟测试，验证实际服务端兼容性。
+- 附带特定服务端构建的 NULL 结果集临时二进制补丁及回滚说明。
 
-NULL 结果集丢字节是已观察到的**服务端协议缺陷**，不能靠本项目客户端代码修复。详见[兼容性问题与排查](docs/pitfalls.md)。
+NULL 结果集丢字节是已观察到的**服务端协议缺陷**，不能靠本项目客户端代码修复。详见[兼容性问题与排查](docs/pitfalls.md)。特定旧构建可查看[服务端临时补丁](server/dolphin/S5.0.0B29/README.md)，其他版本不得直接替换。
 
 ## 环境
 
@@ -97,11 +98,11 @@ go test ./...
 
 ## 实现与许可
 
-驱动目录基于 [go-sql-driver/mysql v1.9.3](https://github.com/go-sql-driver/mysql/tree/v1.9.3)，保留了原始许可证和说明。项目采用 Mozilla Public License 2.0。
+驱动目录基于 [go-sql-driver/mysql v1.9.3](https://github.com/go-sql-driver/mysql/tree/v1.9.3)，保留了原始许可证和说明。项目原创代码采用 Mozilla Public License 2.0；`dolphin.so` 仍受 GBase 原有许可与支持条款约束，详见补丁目录说明。
 
 ## 范围限制
 
-- 不提供服务端二进制补丁；正式环境应优先使用厂商修复版本。
+- 服务端二进制补丁只适用于说明中列出的精确构建和架构；正式环境应优先使用厂商修复版本。
 - 不覆盖 MySQL/InnoDB 到 dolphin 的完整 SQL 方言迁移。
 - 不保证其他 GBase 版本或兼容模式具有相同行为。
 - 写入路径依赖 dolphin 对 `decode(hex)`、`AUTO_INCREMENT` 和 `LAST_INSERT_ID()` 的支持，应在目标版本上验证。
